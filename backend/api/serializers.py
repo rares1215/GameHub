@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from .models import CustomUser
-
-
+from .models import CustomUser,Game,Review
+from django.utils import timezone
 class CustomUserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(max_length=100, write_only=True)
     class Meta:
@@ -32,3 +31,51 @@ class CustomUserSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = CustomUser.objects.create_user(**validated_data)
         return user
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    game = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = Review
+        fields = (
+            'id',
+            'user',
+            'game',
+            'comments',
+            'rating',
+            'created_at',
+        )
+        extra_kwargs = {"created_at":{"read_only":True}}
+
+
+    
+    def validate_rating(self,value):
+        if not (1<=value<=5):
+            raise serializers.ValidationError("Rating must be between 1 and 5")
+        return value
+
+
+
+class GameSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True,read_only=True)
+    class Meta:
+        model = Game
+        fields = (
+            'id',
+            'title',
+            'description',
+            'release_date',
+            'genre',
+            'reviews',
+            'developer',
+            'image',
+            'created_at',
+        )
+        extra_kwargs = {"created_at":{"read_only":True}}
+
+    
+    def validate_release_date(self,value):
+        curr_time = timezone.now().date()
+        if value>curr_time:
+            raise serializers.ValidationError("The release date can't be in the future!")
