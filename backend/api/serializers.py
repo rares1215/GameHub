@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser,Game,Review
+from .models import CustomUser,Game,Review,Favorite
 from django.utils import timezone
 class CustomUserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(max_length=100, write_only=True)
@@ -68,6 +68,8 @@ class GameSerializer(serializers.ModelSerializer):
             'release_date',
             'genre',
             'reviews',
+            'average_rating',
+            'total_ratings',
             'developer',
             'image',
             'created_at',
@@ -79,3 +81,15 @@ class GameSerializer(serializers.ModelSerializer):
         curr_time = timezone.now().date()
         if value>curr_time:
             raise serializers.ValidationError("The release date can't be in the future!")
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    game_title = serializers.CharField(source="game.title", read_only=True)
+    class Meta:
+        model = Favorite
+        fields = (
+            'id',
+            'game_title',
+            'created_at',
+        )
+        extra_kwargs = {"created_at":{"read_only":True}}
