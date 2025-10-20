@@ -85,10 +85,11 @@ class GameSerializer(serializers.ModelSerializer):
 
 class FavoriteSerializer(serializers.ModelSerializer):
     game_title = serializers.CharField(source="game.title", read_only=True)
+    game_id = serializers.IntegerField(source="game.id", read_only=True)
     class Meta:
         model = Favorite
         fields = (
-            'id',
+            'game_id',
             'game_title',
             'created_at',
         )

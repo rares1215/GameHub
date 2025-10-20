@@ -4,6 +4,7 @@ from .models import CustomUser,Game,Review,Favorite
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.response import Response
+from .filters import GameFilter
 # Create your views here.
 
 
@@ -29,7 +30,8 @@ class GetUserProfileView(generics.RetrieveAPIView):
 class GameListView(generics.ListCreateAPIView):
     queryset = Game.objects.prefetch_related("reviews").all()
     serializer_class = GameSerializer
-
+    filterset_class = GameFilter
+    search_fields = ('title')
 
     def get_permissions(self):
         self.permission_classes = [IsAuthenticated]
@@ -107,4 +109,4 @@ class ListFavoritesView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user)
+        return Favorite.objects.select_related('game').filter(user=self.request.user)
