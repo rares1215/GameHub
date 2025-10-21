@@ -59,6 +59,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class GameSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True,read_only=True)
+    average_rating = serializers.FloatField(read_only=True)
+    total_ratings = serializers.IntegerField(read_only=True)
     class Meta:
         model = Game
         fields = (

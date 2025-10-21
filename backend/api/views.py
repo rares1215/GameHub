@@ -4,7 +4,9 @@ from .models import CustomUser,Game,Review,Favorite
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.response import Response
-from .filters import GameFilter
+from .filters import GameFilter,ReviewFilter
+from django.db.models import Avg,Count
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 
@@ -18,7 +20,6 @@ class GetUserProfileView(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
-
     
 
     def get_object(self):
@@ -28,10 +29,20 @@ class GetUserProfileView(generics.RetrieveAPIView):
 
 ######################### Game Views ##########################
 class GameListView(generics.ListCreateAPIView):
-    queryset = Game.objects.prefetch_related("reviews").all()
     serializer_class = GameSerializer
     filterset_class = GameFilter
-    search_fields = ('title')
+    search_fields = ['title', 'developer']
+    ordering_fields = ['release_date', 'avg_rating', 'all_ratings']
+    ordering = ['-release_date']
+
+
+    def get_queryset(self):
+        return(
+            Game.objects.prefetch_related('reviews')
+            .annotate(
+                avg_rating=Avg('reviews__rating'),
+                all_ratings = Count('reviews'))
+                ) 
 
     def get_permissions(self):
         self.permission_classes = [IsAuthenticated]
@@ -56,11 +67,16 @@ class UpdateDeleteGameView(generics.RetrieveUpdateDestroyAPIView):
 class ReviewListView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = ReviewFilter
+    ordering_fields = ['created_at']
+    ordering = ['created_at']
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 30
 
 
     def get_queryset(self):
         game_id = self.kwargs["game_id"]
-        return Review.objects.select_related("user", 'game').filter(game_id=game_id)
+        return Review.objects.select_related("user", 'game').filter(game_id=game_id,)
 
     def perform_create(self,serializer):
         user = self.request.user
@@ -107,6 +123,8 @@ class ToggleFavoriteView(generics.GenericAPIView):
 class ListFavoritesView(generics.ListAPIView):
     serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 20
 
     def get_queryset(self):
         return Favorite.objects.select_related('game').filter(user=self.request.user)
