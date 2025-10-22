@@ -1,4 +1,4 @@
-from rest_framework import generics,serializers,status
+from rest_framework import generics,serializers,status,viewsets
 from .serializers import CustomUserSerializer,GameSerializer,ReviewSerializer,FavoriteSerializer
 from .models import CustomUser,Game,Review,Favorite
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
@@ -28,77 +28,100 @@ class GetUserProfileView(generics.RetrieveAPIView):
 
 
 ######################### Game Views ##########################
-class GameListView(generics.ListCreateAPIView):
+
+
+class GameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     filterset_class = GameFilter
-    search_fields = ['title', 'developer']
-    ordering_fields = ['release_date', 'avg_rating', 'all_ratings']
+    search_fields = ['title','developer']
+    ordering_fields =['release_date', 'avg_rating' , 'all_ratings']
     ordering = ['-release_date']
 
 
     def get_queryset(self):
         return(
-            Game.objects.prefetch_related('reviews')
-            .annotate(
-                avg_rating=Avg('reviews__rating'),
-                all_ratings = Count('reviews'))
-                ) 
+            Game.objects.prefetch_related('reviews').annotate(
+                avg_rating = Avg('reviews__rating'),
+                all_ratings = Count('reviews')
+            )
+        )
 
     def get_permissions(self):
-        self.permission_classes = [IsAuthenticated]
-        if self.request.method =="POST":
+        if self.action in ['create', 'update' , 'partial_update' , 'destroy']:
             self.permission_classes = [IsAdminUser]
+        else:
+            self.permission_classes  = [IsAuthenticated]
         return super().get_permissions()
-
-
-class UpdateDeleteGameView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Game.objects.all()
-    serializer_class = GameSerializer
-    lookup_url_kwarg = "game_id"
-
-    def get_permissions(self):
-        self.permission_classes = [IsAuthenticated]
-        if self.request.method in ("PUT","PATCH","DELETE"):
-            self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
+    
 
 ########################### Review Views ######################
 
-class ReviewListView(generics.ListCreateAPIView):
+class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
     filterset_class = ReviewFilter
     ordering_fields = ['created_at']
     ordering = ['created_at']
     pagination_class = PageNumberPagination
     pagination_class.page_size = 30
 
-
     def get_queryset(self):
         game_id = self.kwargs["game_id"]
-        return Review.objects.select_related("user", 'game').filter(game_id=game_id,)
+        if game_id:
+            return Review.objects.select_related('user','game').filter(game_id=game_id)
+        return queryset
 
     def perform_create(self,serializer):
         user = self.request.user
         game_id = self.kwargs['game_id']
-
         if Review.objects.filter(user=user,game_id=game_id).exists():
-            raise serializers.ValidationError("You have already reviewd this game.")
-
-        serializer.save(user=user,game_id=game_id)
-
-class DeleteUpdateReviewView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    lookup_url_kwarg = 'review_id'
-
+            raise serializers.ValidationError("You have already reviewd this Game")
+        
+        serializer.save(user=user, game_id=game_id)
 
     def get_permissions(self):
-        self.permission_classes = [IsAuthenticated]
-        if self.request.method in ['PUT','DELETE','PATCH']:
+        if self.action in ['create' , 'update' , 'partial_update' , 'destroy']:
             self.permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
-    
+        else:
+            self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
+
+
+
+# class ReviewListView(generics.ListCreateAPIView):
+#     serializer_class = ReviewSerializer
+#     permission_classes = [IsAuthenticated]
+#     filterset_class = ReviewFilter
+#     ordering_fields = ['created_at']
+#     ordering = ['created_at']
+#     pagination_class = PageNumberPagination
+#     pagination_class.page_size = 30
+
+
+#     def get_queryset(self):
+#         game_id = self.kwargs["game_id"]
+#         return Review.objects.select_related("user", 'game').filter(game_id=game_id,)
+
+#     def perform_create(self,serializer):
+#         user = self.request.user
+#         game_id = self.kwargs['game_id']
+
+#         if Review.objects.filter(user=user,game_id=game_id).exists():
+#             raise serializers.ValidationError("You have already reviewd this game.")
+
+#         serializer.save(user=user,game_id=game_id)
+
+# class DeleteUpdateReviewView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
+#     lookup_url_kwarg = 'review_id'
+
+
+#     def get_permissions(self):
+#         self.permission_classes = [IsAuthenticated]
+#         if self.request.method in ['PUT','DELETE','PATCH']:
+#             self.permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
+    
+#         return super().get_permissions()
 
 
 

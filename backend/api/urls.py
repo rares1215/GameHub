@@ -1,13 +1,25 @@
 from django.urls import path
 from . import views
+from rest_framework.routers import DefaultRouter
+
+
+router = DefaultRouter()
+router.register('games', views.GameViewSet, basename='games')
+router.register('reviews', views.ReviewViewSet, basename='reviews')
+
+
+game_reviews = views.ReviewViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
 
 urlpatterns = [
-    path('register/', views.RegisterUserView.as_view(), name = 'register-user'),   
-    path('profile/', views.GetUserProfileView.as_view(), name = 'user-profile'),   
-    path('games/', views.GameListView.as_view(), name = 'games-list'), 
-    path('games/<int:game_id>/', views.UpdateDeleteGameView.as_view(), name = 'manage-game'), 
-    path('games/<int:game_id>/reviews/', views.ReviewListView.as_view(), name = 'games-review'), 
-    path('reviews/<int:review_id>/', views.DeleteUpdateReviewView.as_view(), name = 'manage-review'), 
-    path('games/<int:game_id>/favorite/', views.ToggleFavoriteView.as_view(), name = 'toggle-favorite'), 
-    path('games/favorite/', views.ListFavoritesView.as_view(), name = 'favorite-games'), 
+    path('register/', views.RegisterUserView.as_view(), name='register-user'),
+    path('profile/', views.GetUserProfileView.as_view(), name='user-profile'),
+    path('games/<int:game_id>/reviews/', game_reviews, name='game-reviews'),
+    path('games/<int:game_id>/favorite/', views.ToggleFavoriteView.as_view(), name='toggle-favorite'),
+    path('games/favorite/', views.ListFavoritesView.as_view(), name='favorite-games'),
 ]
+
+
+urlpatterns +=router.urls
