@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from .filters import GameFilter,ReviewFilter
 from django.db.models import Avg,Count
 from rest_framework.pagination import PageNumberPagination
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 # Create your views here.
 
 
@@ -38,7 +41,13 @@ class GameViewSet(viewsets.ModelViewSet):
     ordering = ['-release_date']
 
 
+    @method_decorator(cache_page(60 * 15, key_prefix='games_list'))
+    def list(self,request, *args, **kwargs):
+        return super().list(request,*args,**kwargs)
+
     def get_queryset(self):
+        import time
+        time.sleep(2)
         return(
             Game.objects.prefetch_related('reviews').annotate(
                 avg_rating = Avg('reviews__rating'),

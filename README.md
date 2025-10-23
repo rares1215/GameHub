@@ -8,23 +8,26 @@
 
 This API allows:
 
-- User management and authentication via JWT.
-- Creating, listing, updating, and deleting games (with admin permissions for modifications).
-- Adding reviews for games, with ratings and comments, limited to a single review per user per game.
-- Adding games to a 'Favorite' category (via toggle).
-- Filtering, searching, and sorting games and reviews.
-- Pagination for large results, optimizing performance.
-- Potential support for caching to improve performance in the future.
+-User management and authentication via JWT.
+-Creating, listing, updating, and deleting games (with admin permissions for modifications).
+-Adding reviews for games, with ratings and comments, limited to a single review per user per -game.
+-Adding games to a 'Favorite' category (via toggle).
+-Filtering, searching, and sorting games and reviews.
+-Pagination for large results, optimizing performance.
+-Caching system for faster response times using Redis.
+-Automatic cache invalidation on game creation or deletion (via Django signals).
 
 ---
 
 ## **Technologies Used**
 
 - **Backend:** Django 5, Django REST Framework
+- **Architecture:** ViewSets + Routers for cleaner RESTful design
 - **Authentication:** JWT (JSON Web Tokens)
 - **Database:** PostgreSQL
 - **Filtering and Searching:** Django Filter, DRF Search & Ordering
 - **Pagination:** DRF Pagination
+- **Caching:** Redis + Django cache framework
 - **Frontend (coming soon...):** React.js + TailwindCSS (fullstack)
 
 ---
@@ -61,7 +64,9 @@ This API allows:
 - **Searching:** Text search in title and developer.
 - **Pagination:** Limits the number of results per page for optimal performance.
 - **Performance:** Optimizations using `select_related` and `prefetch_related` to reduce SQL queries.
+- **Caching:** Game list results are cached for 15 minutes in Redis for faster performance.
+- **Cache Invalidation:** Implemented via Django signals (post_save, post_delete) to ensure up-to-date data.
 
 ---
 
-**The application will be a Full-Stack app. The API will continue to evolve (caching, throttling, etc.). This is a work in progress.**
+**The application will be a Full-Stack app. The API will continue to evolve (throttling, etc.). This is a work in progress.**
