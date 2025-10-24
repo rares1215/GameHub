@@ -140,7 +140,18 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
         ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE':50
+    'PAGE_SIZE':50,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'api.throttles.BurstRateThrottle',
+        'api.throttles.SustainedRateThrottle'
+
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'burst': '50/min',
+        'sustained': '1000/day'
+    }
 }
 
 

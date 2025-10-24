@@ -10,6 +10,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
+
 # Create your views here.
 
 
@@ -104,6 +106,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class ToggleFavoriteViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
+
+    @method_decorator(cache_page(60 * 15, key_prefix='favorites_list'))
+    @method_decorator(vary_on_headers('Authorization'))
     def list(self,request):
         queryset = Favorite.objects.select_related('game').filter(user=self.request.user)
         serializer = FavoriteSerializer(queryset, many=True)
