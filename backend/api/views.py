@@ -48,8 +48,6 @@ class GameViewSet(viewsets.ModelViewSet):
         return super().list(request,*args,**kwargs)
 
     def get_queryset(self):
-        import time
-        time.sleep(2)
         return(
             Game.objects.prefetch_related('reviews').annotate(
                 avg_rating = Avg('reviews__rating'),

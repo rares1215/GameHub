@@ -83,7 +83,7 @@ class GameSerializer(serializers.ModelSerializer):
         curr_time = timezone.now().date()
         if value>curr_time:
             raise serializers.ValidationError("The release date can't be in the future!")
-
+        return value
 
 class FavoriteSerializer(serializers.ModelSerializer):
     game_title = serializers.CharField(source="game.title", read_only=True)
