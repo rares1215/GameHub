@@ -1,0 +1,2 @@
+const ACCESS_TOKEN = 'ACCESS'
+const REFRESH_TOKEN = 'REFRESH'
