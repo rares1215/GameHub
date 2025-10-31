@@ -17,7 +17,7 @@ function ProtectedRoute({children}) {
     const refreshToken = async () =>{
         const refresh = localStorage.getItem(REFRESH_TOKEN);
         try {
-            const res = await api.post("auth/token/refresh/", {refresh:refresh});
+            const res = await api.post("api/token/refresh/", {refresh:refresh});
             if(res.status === 200) {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 setIsAuth(true)
@@ -44,7 +44,7 @@ function ProtectedRoute({children}) {
     }
 
 
-    if(isAuth===null) return <LoadingSpinner />
+    if(isAuth===null) return <h1>Loading...</h1>
 
     return isAuth?children:<Navigate to="/login/" />
 }
