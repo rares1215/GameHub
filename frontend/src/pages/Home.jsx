@@ -27,10 +27,10 @@ function Home(){
                 </button>
 
                 <button
-                    onClick={() => navigate("/favorites")}
-                    className="px-8 py-3 rounded-lg text-purple-400 font-semibold border border-purple-500 hover:bg-purple-800/40 transition-all duration-200 shadow-lg"
+                    onClick={() => navigate("/register")}
+                    className="px-8 py-3 rounded-lg text-purple-400 font-semibold border border-purple-500 hover:bg-purple-800/40 transition-all duration-200 shadow-lg cursor-p"
                 >
-                    ❤️ Your Favorites
+                    Create Account
                 </button>
                 </div>
             </div>
