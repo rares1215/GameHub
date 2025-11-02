@@ -4,28 +4,17 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import { Games } from './pages/GamesList';
 import { Register } from './pages/Register';
-
-function LogOut(){
-    localStorage.clear();
-    return <Navigate to='/login/'  replace/>
-}
-
+import { Navbar } from './pages/Navbar';
 
 function App() {
     return(
 
         <BrowserRouter>
-
-
-
-
+            <Navbar />
             <Routes>
                 <Route path='/login/' element = {<Login />}/>
                 <Route path='/register/' element = {<Register />}/>
-                <Route path='/logout/' element = {<LogOut />}/>
-                <Route path='/' element = {
-                    <ProtectedRoute children={<Home/>} />
-                }/>
+                <Route path='/' element = {<Home/>} />
                 <Route path='/games' element = {
                     <ProtectedRoute children={<Games/>} />
                 }/>
