@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom'
+
 export const GameCard = ({ game }) => {
   const date = new Date(game.release_date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -6,7 +8,7 @@ export const GameCard = ({ game }) => {
   });
 
   return (
-    <div
+    <Link to={`/games/${game.id}/`}><div
       className="relative rounded-2xl overflow-hidden shadow-lg border border-gray-700
                  hover:scale-[1.02] hover:border-purple-500 hover:shadow-purple-800/50
                  transition-all duration-300 cursor-pointer group"
@@ -39,6 +41,6 @@ export const GameCard = ({ game }) => {
           {game.total_ratings ?? 0}
         </p>
       </div>
-    </div>
+    </div></Link>
   );
 };

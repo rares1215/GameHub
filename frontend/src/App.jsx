@@ -4,7 +4,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import { Games } from './pages/GamesList';
 import { Register } from './pages/Register';
-import { Navbar } from './pages/Navbar';
+import { Navbar } from './components/Navbar';
+import { SingleGame } from './pages/SingleGame';
 
 function App() {
     return(
@@ -17,6 +18,9 @@ function App() {
                 <Route path='/' element = {<Home/>} />
                 <Route path='/games' element = {
                     <ProtectedRoute children={<Games/>} />
+                }/>
+                <Route path='/games/:id/' element = {
+                    <ProtectedRoute children={<SingleGame/>} />
                 }/>
             </Routes>
         </BrowserRouter>
