@@ -6,6 +6,7 @@ import { Games } from './pages/GamesList';
 import { Register } from './pages/Register';
 import { Navbar } from './components/Navbar';
 import { SingleGame } from './pages/SingleGame';
+import {AdminPannel} from './pages/AdminPannel';
 
 function App() {
     return(
@@ -21,6 +22,9 @@ function App() {
                 }/>
                 <Route path='/games/:id/' element = {
                     <ProtectedRoute children={<SingleGame/>} />
+                }/>
+                 <Route path='/admin-pannel/' element = {
+                    <ProtectedRoute children={<AdminPannel />} requireAdmin={true}/>
                 }/>
             </Routes>
         </BrowserRouter>

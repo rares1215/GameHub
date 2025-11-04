@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router";
 import api from "../api";
+import { SmallSpinner } from "../components/LoadingSpinner";
 
 
 export const Register = () =>{
@@ -10,6 +11,7 @@ export const Register = () =>{
     const [first_name, setFirstName] = useState('');
     const [last_name, setLastName] = useState('');
     const [email,setEmail] = useState('');
+    const [isLoading,setIsLoading] = useState(false);
 
     const navigate = useNavigate()
 
@@ -18,6 +20,7 @@ export const Register = () =>{
 
 
     const registerUser = async(e) =>{
+    setIsLoading(true);
     e.preventDefault();
     setError('');
 
@@ -32,6 +35,7 @@ export const Register = () =>{
             setUsername('');
             setPassword('');
             setPassword2('');
+            setIsLoading(false);
         }
     }catch (err) {
         if (err.response && err.response.data) {
@@ -47,6 +51,8 @@ export const Register = () =>{
         } else {
             setError("Something went wrong. Try again later.");
         }
+        }finally{
+          setIsLoading(false);
         }
     }
 
@@ -186,7 +192,7 @@ export const Register = () =>{
             Register
           </button>
         </form>
-
+        {isLoading?<SmallSpinner />:""}  
         <p className="text-center text-gray-400 text-sm mt-6">
           Already have an account?{" "}
           <span

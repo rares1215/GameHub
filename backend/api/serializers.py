@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import CustomUser,Game,Review,Favorite
 from django.utils import timezone
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 class CustomUserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(max_length=100, write_only=True)
     class Meta:
@@ -96,3 +98,18 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'created_at',
         )
         extra_kwargs = {"created_at":{"read_only":True}}
+
+
+
+
+##### Custom for Access jwt token #######
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # 👇 adăugăm atributele utile
+        token['is_staff'] = user.is_staff
+        token['is_superuser'] = user.is_superuser
+        token['username'] = user.username
+        return token

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router"
 import api from "../api";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 import { Star, Calendar, Code2, Gamepad2, Gauge, Users } from "lucide-react";
 
 
@@ -38,9 +39,7 @@ export const SingleGame = () =>{
     }
         if (!game.title) {
             return (
-            <div className="flex items-center justify-center h-screen text-gray-400 text-lg">
-                Loading game details...
-            </div>
+              <LoadingSpinner />
             );
         }
 

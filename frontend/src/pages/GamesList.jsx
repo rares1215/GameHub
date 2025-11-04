@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import api from "../api";
 import { GameCard } from "../components/GameCard";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export const Games = () => {
   const [gamesList, setGamesList] = useState([]);
@@ -36,9 +37,7 @@ export const Games = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-400 text-lg mt-10">
-            No games available yet.
-          </p>
+          <LoadingSpinner />
         )}
       </div>
     </div>

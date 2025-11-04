@@ -1,18 +1,51 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Star, User, LogOut, Gamepad2, Menu, X , LogIn,UserPlus} from "lucide-react";
+import {
+  Home,
+  Star,
+  User,
+  LogOut,
+  Gamepad2,
+  Menu,
+  X,
+  LogIn,
+  UserPlus,
+  PanelTopBottomDashed,
+} from "lucide-react";
 import { ACCESS_TOKEN } from "../constants";
+import { jwtDecode } from "jwt-decode";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export const Navbar = () => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuth,setIsAuth] = useState(false);
   const location = useLocation();
 
-  useEffect(() =>{
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    setIsAuth(!!token);
-  },[location])
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, [location]);
+
+  const checkAuth = () => {
+    try {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      if (!token) {
+        setIsAuth(false);
+        setIsAdmin(false);
+        return;
+      }
+
+      const decoded = jwtDecode(token);
+      setIsAuth(true);
+      setIsAdmin(decoded.is_staff || decoded.is_superuser);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      setIsAuth(false);
+      setIsAdmin(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -25,13 +58,21 @@ export const Navbar = () => {
         { label: "Games", icon: <Gamepad2 size={22} />, path: "/games/" },
         { label: "Favorites", icon: <Star size={22} />, path: "/favorites/" },
         { label: "Profile", icon: <User size={22} />, path: "/profile/" },
+        ...(isAdmin
+          ? [
+              {
+                label: "Admin Panel",
+                icon: <PanelTopBottomDashed size={22} />,
+                path: "/admin-pannel/",
+              },
+            ]
+          : []),
       ]
     : [
         { label: "Home", icon: <Home size={22} />, path: "/" },
         { label: "Login", icon: <LogIn size={22} />, path: "/login/" },
         { label: "Register", icon: <UserPlus size={22} />, path: "/register/" },
       ];
-
 
   return (
     <>
@@ -41,7 +82,7 @@ export const Navbar = () => {
         <div className="flex items-center justify-center mb-10">
           <h1
             onClick={() => navigate("/")}
-            className="text-2xl font-extrabold text-purple-400 tracking-wider hover:text-purple-300 transition"
+            className="text-2xl font-extrabold text-purple-400 tracking-wider hover:text-purple-300 transition cursor-pointer"
           >
             GameHub
           </h1>
@@ -56,33 +97,36 @@ export const Navbar = () => {
               className="flex items-center gap-3 text-gray-300 hover:text-purple-400 hover:bg-gray-800/60 px-4 py-2 rounded-lg transition-all duration-200"
             >
               {item.icon}
-              <span className="font-medium text-sm tracking-wide">{item.label}</span>
+              <span className="font-medium text-sm tracking-wide">
+                {item.label}
+              </span>
             </button>
           ))}
         </nav>
 
         {/* Logout */}
-        <div className="mt-auto">
-          <button
-            onClick={handleLogout}
-            className="flex items-center justify-center gap-2 text-gray-400 hover:text-red-400 hover:bg-gray-800/60 px-4 py-2 rounded-lg w-full transition-all duration-200"
-          >
-            <LogOut size={20} />
-            <span className="font-medium text-sm">Logout</span>
-          </button>
-        </div>
+
+          <div className="mt-auto">
+            {isAuth && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-2 text-gray-400 hover:text-red-400 hover:bg-gray-800/60 px-4 py-2 rounded-lg w-full transition-all duration-200"
+            >
+              <LogOut size={20} />
+              <span className="font-medium text-sm">Logout</span>
+            </button>)}
+          </div>
       </div>
 
       {/* Mobile Navbar */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-black/90 border-b border-gray-800 flex items-center justify-between px-5 py-3 z-50">
         <h1
           onClick={() => navigate("/")}
-          className="text-xl font-bold text-purple-400 tracking-wide"
+          className="text-xl font-bold text-purple-400 tracking-wide cursor-pointer"
         >
           GameHub
         </h1>
 
-        {/* Toggle button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="text-gray-300 hover:text-purple-400 transition"
@@ -104,23 +148,26 @@ export const Navbar = () => {
               className="flex items-center gap-3 text-gray-300 hover:text-purple-400 hover:bg-gray-800/70 px-4 py-2 rounded-lg transition-all"
             >
               {item.icon}
-              <span className="font-medium text-sm tracking-wide">{item.label}</span>
+              <span className="font-medium text-sm tracking-wide">
+                {item.label}
+              </span>
             </button>
           ))}
 
-          <button
-            onClick={() => {
-              handleLogout();
-              setIsOpen(false);
-            }}
-            className="flex items-center justify-center gap-2 text-gray-400 hover:text-red-400 hover:bg-gray-800/60 px-4 py-2 rounded-lg transition-all duration-200"
-          >
-            <LogOut size={20} />
-            <span className="font-medium text-sm">Logout</span>
-          </button>
+          {isAuth && (
+            <button
+              onClick={() => {
+                handleLogout();
+                setIsOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 text-gray-400 hover:text-red-400 hover:bg-gray-800/60 px-4 py-2 rounded-lg transition-all duration-200"
+            >
+              <LogOut size={20} />
+              <span className="font-medium text-sm">Logout</span>
+            </button>
+          )}
         </div>
       )}
     </>
   );
 };
-

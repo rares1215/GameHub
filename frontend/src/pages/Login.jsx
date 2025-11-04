@@ -2,14 +2,17 @@ import { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN,REFRESH_TOKEN } from "../constants";
+import { SmallSpinner } from "../components/LoadingSpinner";
 
 function Login() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading,setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const loginUser = async (e) => {
+    setIsLoading(true)
     e.preventDefault();    
     setError("");
 
@@ -23,6 +26,8 @@ function Login() {
     } catch (err) {
       console.error(err);
       setError("Invalid username or password.");
+    } finally{
+      setIsLoading(false);
     }
   };
 
@@ -88,7 +93,7 @@ function Login() {
             Log In
           </button>
         </form>
-
+        {isLoading?<SmallSpinner />:""}
         <p className="text-center text-gray-400 text-sm mt-6">
           Don’t have an account?{" "}
           <span

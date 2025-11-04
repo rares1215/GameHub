@@ -1,5 +1,5 @@
 from rest_framework import generics,serializers,status,viewsets
-from .serializers import CustomUserSerializer,GameSerializer,ReviewSerializer,FavoriteSerializer
+from .serializers import CustomUserSerializer,GameSerializer,ReviewSerializer,FavoriteSerializer,CustomTokenObtainPairSerializer
 from .models import CustomUser,Game,Review,Favorite
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from .permissions import IsOwnerOrReadOnly
@@ -11,6 +11,10 @@ from rest_framework.pagination import PageNumberPagination
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
 
 # Create your views here.
 
@@ -123,3 +127,7 @@ class ToggleFavoriteViewSet(viewsets.ViewSet):
             favorite.delete()
             return Response({"status": "Removed from favorites"})
         return Response({"status": "Added to favorites"})
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
