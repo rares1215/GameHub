@@ -4,6 +4,7 @@ import { useParams } from "react-router"
 import api from "../api";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { Star, Calendar, Code2, Gamepad2, Gauge, Users } from "lucide-react";
+import { AddReview } from "./AddReview";
 
 
 
@@ -23,8 +24,7 @@ export const SingleGame = () =>{
         setError('')
 
         try{
-
-            const res = await api.get(`api/games/${id}/`)
+              const res = await api.get(`api/games/${id}/?_=${Date.now()}`);
             if(res.status===200){
                 console.log('Succes on getting the data');
                 setGame(res.data);
@@ -181,6 +181,10 @@ export const SingleGame = () =>{
               </button>
             </div>
           )}
+
+          <div className="mt-16 border-t border-gray-800 pt-10">
+            <AddReview gameId={game.id} />
+          </div>
         </div>
       </div>
     </div>

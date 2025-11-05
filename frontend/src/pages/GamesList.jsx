@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import api from "../api";
 import { GameCard } from "../components/GameCard";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export const Games = () => {
   const [gamesList, setGamesList] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     getGamesList();
@@ -14,7 +12,7 @@ export const Games = () => {
 
   const getGamesList = async () => {
     try {
-      const res = await api.get("api/games/");
+        const res = await api.get(`api/games/`);
       if (res.status === 200) {
         setGamesList(res.data.results || []);
       }

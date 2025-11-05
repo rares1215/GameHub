@@ -1,10 +1,11 @@
 import { Edit2, Trash2 } from "lucide-react";
 import api from "../api";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export const AdminGame = ({ game }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const navigate = useNavigate()
   const handleDelete = async () => {
     if (!confirm(`Are you sure you want to delete "${game.title}"?`)) return;
     setIsDeleting(true);
@@ -24,7 +25,7 @@ export const AdminGame = ({ game }) => {
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-xl font-semibold text-purple-300">{game.title}</h2>
         <div className="flex gap-3">
-          <button className="p-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+          <button onClick={() => navigate(`/admin-pannel/edit-game/${game.id}/`)} className="p-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition">
             <Edit2 size={18} />
           </button>
           <button
