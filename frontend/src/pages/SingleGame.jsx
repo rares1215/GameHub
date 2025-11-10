@@ -1,51 +1,61 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { useParams } from "react-router"
+import { useParams } from "react-router";
 import api from "../api";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { Star, Calendar, Code2, Gamepad2, Gauge, Users } from "lucide-react";
 import { AddReview } from "./AddReview";
+import { jwtDecode } from "jwt-decode";
+import { ACCESS_TOKEN } from "../constants";
 
+export const SingleGame = () => {
+  const { id } = useParams();
+  const [game, setGame] = useState({});
+  const [error, setError] = useState({});
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
+  useEffect(() => {
+    getGame();
 
-export const SingleGame = () =>{
-    const {id} = useParams();
-    const [game,setGame] = useState({});
-    const [error,setError] = useState({});
-    const [showAllReviews, setShowAllReviews] = useState(false);
-
-    useEffect(() =>{
-        getGame();
-    }, [id]);
-
-
-
-    const getGame = async () =>{
-        setError('')
-
-        try{
-              const res = await api.get(`api/games/${id}/?_=${Date.now()}`);
-            if(res.status===200){
-                console.log('Succes on getting the data');
-                setGame(res.data);
-            }
-
-        }catch(err){
-            if(err.response && err.response.data){
-                console.log(err.response.data);
-                setError('Failed to load game details')
-            }
-        }
+    // Decode JWT to get current user
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (token) {
+      const decoded = jwtDecode(token);
+      setCurrentUser(decoded.username || decoded.user || decoded.sub);
     }
-        if (!game.title) {
-            return (
-              <LoadingSpinner />
-            );
-        }
+  }, [id]);
 
-    const previewReview = game.reviews?.[0];
+  const getGame = async () => {
+    setError("");
 
-    return (
+    try {
+      const res = await api.get(`api/games/${id}/?_=${Date.now()}`);
+      if (res.status === 200) {
+        console.log("Succes on getting the data");
+        setGame(res.data);
+      }
+    } catch (err) {
+      if (err.response && err.response.data) {
+        console.log(err.response.data);
+        setError("Failed to load game details");
+      }
+    }
+  };
+
+  if (!game.title) {
+    return <LoadingSpinner />;
+  }
+
+  const previewReview = game.reviews?.[0];
+  const hasReviewed = game.reviews?.some((rev) => rev.user === currentUser);
+
+  // 🔁 Funcție care actualizează lista de review-uri după ce userul adaugă unul nou
+  const handleAddReview = async () => {
+    await getGame(); // Reîncarcă detaliile jocului (cu review nou)
+  };
+
+  return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-purple-950 text-white">
       {/* ======== HERO IMAGE SECTION ======== */}
       <div
@@ -182,11 +192,18 @@ export const SingleGame = () =>{
             </div>
           )}
 
+          {/* ======== ADD REVIEW SECTION ======== */}
           <div className="mt-16 border-t border-gray-800 pt-10">
-            <AddReview gameId={game.id} />
+            {!hasReviewed ? (
+              <AddReview gameId={game.id} handleAddReview={handleAddReview} />
+            ) : (
+              <p className="text-center text-gray-400 text-sm italic mt-4">
+                You’ve already left a review for this game.
+              </p>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};

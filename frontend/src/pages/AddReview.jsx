@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { SmallSpinner } from "../components/LoadingSpinner";
 import api from "../api";
 
-export const AddReview = ({ gameId }) => {
+export const AddReview = ({ gameId, handleAddReview }) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +25,7 @@ export const AddReview = ({ gameId }) => {
         setComment("");
         setRating(0);
         navigate(`/games/${gameId}/`);
+        handleAddReview?.();
       }
     } catch (err) {
       console.error(err);
