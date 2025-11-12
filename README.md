@@ -1,12 +1,13 @@
 # Mini GameHub API
 
-**Mini GameHub API** is the backend for an application where users can express their opinions and thoughts about certain video games. The API is built and optimized so that users can leave comments and ratings for specific games, but only admins can add new games.
+**GameHub** is a full-stack web app where users can explore, review, and rate video games.  
+Built with **React** (frontend) and **Django REST Framework** (backend), it demonstrates clean architecture, caching, authentication, and CRUD operations.
 
 ---
 
 ## **Description**
 
-This API allows:
+This App allows:
 
 - User management and authentication via JWT.
 - Creating, listing, updating, and deleting games (with admin permissions for modifications).
@@ -21,47 +22,15 @@ This API allows:
 
 ---
 
-## **Technologies Used**
+## Tech Stack
 
-- **Backend:** Django 5, Django REST Framework
-- **Architecture:** ViewSets + Routers for cleaner RESTful design
-- **Authentication:** JWT (JSON Web Tokens)
-- **Database:** PostgreSQL
-- **Filtering and Searching:** Django Filter, DRF Search & Ordering
-- **Pagination:** DRF Pagination
-- **Caching:** Redis + Django cache framework
-- **Frontend (coming soon...):** React.js + TailwindCSS (fullstack)
-- **Throttling:** Custom rate-limiting using DRF throttling classes (`BurstRateThrottle`, `SustainedRateThrottle`)
-- **Testing:** Django REST Framework built-in test suite (`APITestCase`)
+**Frontend:** React 18, React Router, TailwindCSS  
+**Backend:** Django 5, Django REST Framework, PostgreSQL  
+**Caching:** Redis  
+**Auth:** JWT (SimpleJWT)  
+**Tools:** Docker, DRF Filters, Signals, Axios
 
----
-
-## **Main Endpoints**
-
-- **Users & Auth**
-
-  - `/api/register/` - Create account
-  - `/api/token/` - Obtain JWT token
-  - `/api/token/refresh/` - Refresh token
-  - `/api/profile/` - Get authenticated user profile
-
-- **Games**
-
-  - `/api/games/` - List and create games (POST for admin)
-  - `/api/games/<game_id>/` - Retrieve, Update, Delete game (Update/Delete for admin)
-
-- **Reviews**
-
-  - `/api/games/<game_id>/reviews/` - List and create reviews
-  - `/api/reviews/<review_id>/` - Retrieve, Update, Delete review (update/delete only by owner)
-
-- **Favorites**
-  - `/api/favorites/` - List user favorites
-  - `/api/games/<game_id>/favorite/` - Toggle favorite (add/remove game from favorites)
-
----
-
-## **Advanced Features**
+## **Features**
 
 - **Ordering:** Games and reviews can be ordered by relevant data (e.g., release date, average rating, number of reviews).
 - **Filtering:** Support for filtering games and reviews by various criteria (genre, developer, rating, etc.).
@@ -83,11 +52,7 @@ This API allows:
 
 ---
 
-**The application will be a Full-Stack app. The API will continue to evolve (throttling, etc.). This is a work in progress.**
-
----
-
-## 🌍 **Environment Variables**
+## **Environment Variables**
 
 | Key             | Description                           |
 | --------------- | ------------------------------------- |
@@ -102,9 +67,22 @@ This API allows:
 
 ---
 
-## 🧰 **Setup & Run Locally**
+## App Preview
+
+| Page                      | Screenshot                                                         |
+| ------------------------- | ------------------------------------------------------------------ |
+| **Home**                  | ![Games Page](./frontend/public/screenshots/home-games.png)        |
+| **Login**                 | ![Login Page](./frontend/public/screenshots/login-register.png)    |
+| **Single Game + Reviews** | ![Single Game Page](./frontend/public/screenshots/single-game.png) |
+| **Admin Panel**           | ![Admin Panel](./frontend/public/screenshots/admin-panel.png)      |
+
+---
+
+## **Setup & Run Locally**
 
 ```bash
+# --- For the Back End ---
+
 # 1 Clone the repository
 git clone https://github.com/yourusername/GameHub-API.git
 cd GameHub-API
@@ -125,4 +103,10 @@ docker run -p 6379:6379 redis
 
 # 6 Run the development server
 python manage.py runserver
+
+
+# --- For the Front End ---
+cd frontend
+npm install
+npm run dev
 ```
