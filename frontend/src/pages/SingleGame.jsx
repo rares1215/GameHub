@@ -5,6 +5,7 @@ import api from "../api";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { Star, Calendar, Code2, Gamepad2, Gauge, Users } from "lucide-react";
 import { AddReview } from "./AddReview";
+import { ReviewItem } from "../components/ReviewItem";
 import { jwtDecode } from "jwt-decode";
 import { ACCESS_TOKEN } from "../constants";
 
@@ -18,7 +19,7 @@ export const SingleGame = () => {
   useEffect(() => {
     getGame();
 
-    // Decode JWT to get current user
+    // Decode JWT pentru a afla utilizatorul curent
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       const decoded = jwtDecode(token);
@@ -32,7 +33,6 @@ export const SingleGame = () => {
     try {
       const res = await api.get(`api/games/${id}/?_=${Date.now()}`);
       if (res.status === 200) {
-        console.log("Succes on getting the data");
         setGame(res.data);
       }
     } catch (err) {
@@ -50,14 +50,14 @@ export const SingleGame = () => {
   const previewReview = game.reviews?.[0];
   const hasReviewed = game.reviews?.some((rev) => rev.user === currentUser);
 
-  // 🔁 Funcție care actualizează lista de review-uri după ce userul adaugă unul nou
+  // Funcție care reîncarcă jocul (după adăugare / edit / ștergere review)
   const handleAddReview = async () => {
-    await getGame(); // Reîncarcă detaliile jocului (cu review nou)
+    await getGame();
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-purple-950 text-white">
-      {/* ======== HERO IMAGE SECTION ======== */}
+      {/* ======== HERO IMAGE ======== */}
       <div
         className="relative w-full h-[60vh] bg-cover bg-center flex items-center justify-center"
         style={{
@@ -72,13 +72,13 @@ export const SingleGame = () => {
         </h1>
       </div>
 
-      {/* ======== DESCRIPTION SECTION ======== */}
+      {/* ======== DESCRIPTION ======== */}
       <div className="max-w-5xl mx-auto px-6 py-10">
         <p className="text-gray-300 leading-relaxed text-lg border-l-4 border-purple-500 pl-5 mb-10">
           {game.description}
         </p>
 
-        {/* ======== GAME STATS CARD ======== */}
+        {/* ======== GAME DETAILS ======== */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl shadow-2xl p-8 backdrop-blur-md">
           <h2 className="text-2xl font-bold text-purple-400 mb-6 tracking-wide">
             Game Details
@@ -131,54 +131,32 @@ export const SingleGame = () => {
           </div>
         </div>
 
-        {/* ======== REVIEWS SECTION ======== */}
+        {/* ======== REVIEWS ======== */}
         <div className="mt-14">
           <h3 className="text-2xl font-bold text-purple-300 mb-6 flex items-center gap-2">
             <Gamepad2 size={22} /> Reviews
           </h3>
 
           <div className="space-y-6">
-            {(!showAllReviews && previewReview && (
-              <div
+            {!showAllReviews && previewReview ? (
+              <ReviewItem
                 key={previewReview.id}
-                className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-md"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-lg font-semibold text-purple-300">
-                    {previewReview.user}
-                  </h4>
-                  <span className="text-yellow-400 flex items-center gap-1">
-                    <Star size={16} />
-                    {previewReview.rating}
-                  </span>
-                </div>
-                <p className="text-gray-300 italic">{previewReview.comments}</p>
-                <p className="text-gray-500 text-xs mt-3">
-                  {new Date(previewReview.created_at).toLocaleString()}
-                </p>
-              </div>
-            )) ||
-              (showAllReviews &&
-                game.reviews.map((rev) => (
-                  <div
-                    key={rev.id}
-                    className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-md"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-lg font-semibold text-purple-300">
-                        {rev.user}
-                      </h4>
-                      <span className="text-yellow-400 flex items-center gap-1">
-                        <Star size={16} />
-                        {rev.rating}
-                      </span>
-                    </div>
-                    <p className="text-gray-300 italic">{rev.comments}</p>
-                    <p className="text-gray-500 text-xs mt-3">
-                      {new Date(rev.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                )))}
+                review={previewReview}
+                gameId={game.id}
+                currentUser={currentUser}
+                onReviewUpdated={handleAddReview}
+              />
+            ) : (
+              game.reviews?.map((rev) => (
+                <ReviewItem
+                  key={rev.id}
+                  review={rev}
+                  gameId={game.id}
+                  currentUser={currentUser}
+                  onReviewUpdated={handleAddReview}
+                />
+              ))
+            )}
           </div>
 
           {game.reviews?.length > 1 && (
@@ -192,10 +170,10 @@ export const SingleGame = () => {
             </div>
           )}
 
-          {/* ======== ADD REVIEW SECTION ======== */}
+          {/* ======== ADD REVIEW ======== */}
           <div className="mt-16 border-t border-gray-800 pt-10">
             {!hasReviewed ? (
-              <AddReview gameId={game.id} handleAddReview={handleAddReview} />
+              <AddReview gameId={game.id} onReviewAdded={handleAddReview} />
             ) : (
               <p className="text-center text-gray-400 text-sm italic mt-4">
                 You’ve already left a review for this game.

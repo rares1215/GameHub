@@ -60,32 +60,39 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class GameSerializer(serializers.ModelSerializer):
-    reviews = ReviewSerializer(many=True,read_only=True)
+    reviews = ReviewSerializer(many=True, read_only=True)
     average_rating = serializers.FloatField(read_only=True)
     total_ratings = serializers.IntegerField(read_only=True)
+    is_favorite = serializers.SerializerMethodField()
+
     class Meta:
         model = Game
         fields = (
-            'id',
-            'title',
-            'description',
-            'release_date',
-            'genre',
-            'reviews',
-            'average_rating',
-            'total_ratings',
-            'developer',
-            'image',
-            'created_at',
+            "id",
+            "title",
+            "description",
+            "release_date",
+            "genre",
+            "reviews",
+            "average_rating",
+            "total_ratings",
+            "developer",
+            "image",
+            "created_at",
+            "is_favorite",
         )
-        extra_kwargs = {"created_at":{"read_only":True}}
+        extra_kwargs = {"created_at": {"read_only": True}}
 
-    
-    def validate_release_date(self,value):
+    def validate_release_date(self, value):
         curr_time = timezone.now().date()
-        if value>curr_time:
+        if value > curr_time:
             raise serializers.ValidationError("The release date can't be in the future!")
         return value
+
+    # Calculăm dinamic is_favorite, dar folosind contextul optimizat
+    def get_is_favorite(self, obj):
+        favorite_ids = self.context.get("favorite_ids", set())
+        return obj.id in favorite_ids
 
 class FavoriteSerializer(serializers.ModelSerializer):
     game_title = serializers.CharField(source="game.title", read_only=True)

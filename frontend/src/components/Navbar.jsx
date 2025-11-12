@@ -56,8 +56,7 @@ export const Navbar = () => {
     ? [
         { label: "Home", icon: <Home size={22} />, path: "/" },
         { label: "Games", icon: <Gamepad2 size={22} />, path: "/games/" },
-        { label: "Favorites", icon: <Star size={22} />, path: "/favorites/" },
-        { label: "Profile", icon: <User size={22} />, path: "/profile/" },
+        { label: "Favorites", icon: <Star size={22} />, path: "/games/favorites/" },
         ...(isAdmin
           ? [
               {

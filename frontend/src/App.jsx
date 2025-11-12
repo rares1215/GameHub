@@ -9,6 +9,7 @@ import { SingleGame } from './pages/SingleGame';
 import {AdminPannel} from './pages/AdminPannel';
 import { AddGame } from './components/AddGame';
 import { EditGame } from './components/EditGame';
+import { Favorites } from './pages/Favorites';
 
 function App() {
     return(
@@ -27,6 +28,9 @@ function App() {
                 }/>
                  <Route path='/admin-pannel/' element = {
                     <ProtectedRoute children={<AdminPannel />} requireAdmin={true}/>
+                }/>
+                 <Route path='/games/favorites/' element = {
+                    <ProtectedRoute children={<Favorites />}/>
                 }/>
                  <Route path='/admin-pannel/add-game/' element = {
                     <ProtectedRoute children={<AddGame />} requireAdmin={true}/>

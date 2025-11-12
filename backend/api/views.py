@@ -10,6 +10,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+
 from django.views.decorators.vary import vary_on_headers
 
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -39,32 +41,57 @@ class GetUserProfileView(generics.RetrieveAPIView):
 ######################### Game Views ##########################
 
 
+
 class GameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     filterset_class = GameFilter
-    search_fields = ['title','developer']
-    ordering_fields =['release_date', 'avg_rating' , 'all_ratings']
+    search_fields = ['title', 'developer']
+    ordering_fields = ['release_date', 'avg_rating', 'all_ratings']
     ordering = ['-release_date']
 
-
-    @method_decorator(cache_page(60 * 15, key_prefix='games_list'))
-    def list(self,request, *args, **kwargs):
-        return super().list(request,*args,**kwargs)
-
     def get_queryset(self):
-        return(
-            Game.objects.prefetch_related('reviews').annotate(
-                avg_rating = Avg('reviews__rating'),
-                all_ratings = Count('reviews')
+        """
+        Cacheăm Doar ID-urile jocurilor.
+        Apoi reconstruim queryset-ul real pentru Django Filters.
+        """
+        cached_ids = cache.get("cached_game_ids")
+
+        if cached_ids is None:
+            print("⚙️ Caching game IDs in Redis...")
+            cached_ids = list(
+                Game.objects.annotate(
+                    avg_rating=Avg("reviews__rating"),
+                    all_ratings=Count("reviews")
+                ).values_list("id", flat=True)
+            )
+            cache.set("cached_game_ids", cached_ids, 60 * 15)  # 15 minute
+
+        # reconstruim queryset-ul real din IDs
+        return (
+            Game.objects.filter(id__in=cached_ids)
+            .prefetch_related("reviews")
+            .annotate(
+                avg_rating=Avg("reviews__rating"),
+                all_ratings=Count("reviews")
             )
         )
 
     def get_permissions(self):
-        if self.action in ['create', 'update' , 'partial_update' , 'destroy']:
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
             self.permission_classes = [IsAdminUser]
         else:
-            self.permission_classes  = [IsAuthenticated]
+            self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_ids = set(
+                Favorite.objects.filter(user=user).values_list("game_id", flat=True)
+            )
+            context["favorite_ids"] = favorite_ids
+        return context
     
 
 ########################### Review Views ######################
