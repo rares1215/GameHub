@@ -75,6 +75,7 @@ This App allows:
 | **Login**                 | ![Login Page](./frontend/public/screenshots/login-register.png)    |
 | **Single Game + Reviews** | ![Single Game Page](./frontend/public/screenshots/single-game.png) |
 | **Admin Panel**           | ![Admin Panel](./frontend/public/screenshots/admin-panel.png)      |
+| **Games List**            | ![Games List](./frontend/public/screenshots/Games-List.png)        |
 
 ---
 

@@ -12,8 +12,15 @@ __pycache__/
 *.pyc
 *.sqlite3
 db.sqlite3
-/media/
+
+# Media files (uploaded images)
+media/
+*/media/
+
+# Static files (built)
 staticfiles/
+
+# Environment variables
 .env
 
 # VS Code

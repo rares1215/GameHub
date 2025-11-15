@@ -57,20 +57,21 @@ export const SingleGame = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-purple-950 text-white">
-      {/* ======== HERO IMAGE ======== */}
-      <div
-        className="relative w-full h-[60vh] bg-cover bg-center flex items-center justify-center"
-        style={{
-          backgroundImage: game.image
-            ? `url(${game.image})`
-            : "url('https://images.unsplash.com/photo-1605902711622-cfb43c4437d1?auto=format&fit=crop&w=1600&q=80')",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-        <h1 className="relative z-10 text-5xl md:text-6xl font-extrabold text-purple-400 tracking-wide drop-shadow-lg">
-          {game.title}
-        </h1>
-      </div>
+        {/* ======== HERO IMAGE ======== */}
+        <div className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden bg-black">
+          <img
+            src={
+              game.image
+                ? game.image
+                : "https://images.unsplash.com/photo-1605902711622-cfb43c4437d1?auto=format&fit=crop&w=1600&q=80"
+            }
+            alt={game.title}
+            className="absolute inset-0 w-full h-full object-cover opacity-90"
+          />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
 
       {/* ======== DESCRIPTION ======== */}
       <div className="max-w-5xl mx-auto px-6 py-10">

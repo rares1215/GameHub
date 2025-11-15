@@ -1,47 +1,43 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { SmallSpinner } from "../components/LoadingSpinner";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router";
 import api from "../api";
+import { SmallSpinner } from "../components/LoadingSpinner";
 
 export const EditGame = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [genre, setGenre] = useState("");
   const [developer, setDeveloper] = useState("");
   const [image, setImage] = useState(null);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [preview, setPreview] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    getGame();
-  }, [id]);
+    loadGame();
+  }, []);
 
-  const getGame = async () => {
+  const loadGame = async () => {
     try {
       const res = await api.get(`api/games/${id}/`);
-      if (res.status === 200) {
-        const game = res.data;
-        setTitle(game.title);
-        setDescription(game.description);
-        setReleaseDate(game.release_date);
-        setGenre(game.genre);
-        setDeveloper(game.developer);
-        if (game.image) setPreview(game.image);
-      }
+      const g = res.data;
+
+      setTitle(g.title);
+      setDescription(g.description);
+      setReleaseDate(g.release_date);
+      setGenre(g.genre);
+      setDeveloper(g.developer);
     } catch (err) {
-      console.error("Error fetching game:", err);
-      setError("Failed to load game data.");
+      console.error(err);
     }
   };
 
-  const UpdateGame = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       const formData = new FormData();
@@ -52,150 +48,74 @@ export const EditGame = () => {
       formData.append("developer", developer);
       if (image) formData.append("image", image);
 
-      const res = await api.put(`api/games/${id}/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await api.put(`api/games/${id}/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (res.status === 200) {
-        navigate("/admin-pannel/");
-      }
+      navigate("/admin-pannel/");
     } catch (err) {
-      console.error(err);
-      setError("Failed to update the game. Please check your input.");
+      console.log(err);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-900 px-6">
-      <div className="bg-gray-800/90 backdrop-blur-md border border-gray-700 shadow-2xl rounded-2xl p-10 w-full max-w-2xl">
-        <h1 className="text-3xl font-extrabold text-center text-purple-400 mb-8">
+    <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white px-6">
+      <div className="bg-gray-800 p-8 rounded-xl w-full max-w-xl shadow-xl">
+
+        <h1 className="text-3xl font-bold text-purple-400 mb-6 text-center">
           Edit Game
         </h1>
 
-        <form
-          onSubmit={UpdateGame}
-          autoComplete="off"
-          className="flex flex-col space-y-6"
-        >
-          {/* Title */}
-          <div>
-            <label className="block text-gray-400 mb-2 text-sm font-medium">
-              Game Title
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
 
-          {/* Description */}
-          <div>
-            <label className="block text-gray-400 mb-2 text-sm font-medium">
-              Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full h-32 px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            ></textarea>
-          </div>
+          <input
+            className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
-          {/* Release Date */}
-          <div>
-            <label className="block text-gray-400 mb-2 text-sm font-medium">
-              Release Date
-            </label>
-            <input
-              type="date"
-              value={releaseDate}
-              onChange={(e) => setReleaseDate(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-          </div>
+          <textarea
+            className="w-full p-2 bg-gray-900 border border-gray-700 rounded h-28"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
-          {/* Genre */}
-          <div>
-            <label className="block text-gray-400 mb-2 text-sm font-medium">
-              Genre
-            </label>
-            <input
-              type="text"
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-          </div>
+          <input
+            type="date"
+            className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+            value={releaseDate}
+            onChange={(e) => setReleaseDate(e.target.value)}
+          />
 
-          {/* Developer */}
-          <div>
-            <label className="block text-gray-400 mb-2 text-sm font-medium">
-              Developer
-            </label>
-            <input
-              type="text"
-              value={developer}
-              onChange={(e) => setDeveloper(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-          </div>
+          <input
+            className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+            value={genre}
+            onChange={(e) => setGenre(e.target.value)}
+          />
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-gray-400 mb-2 text-sm font-medium">
-              Game Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                setImage(e.target.files[0]);
-                setPreview(URL.createObjectURL(e.target.files[0]));
-              }}
-              className="w-full text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
-            />
-          </div>
+          <input
+            className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+            value={developer}
+            onChange={(e) => setDeveloper(e.target.value)}
+          />
 
-          {/* Preview Image */}
-          {preview && (
-            <div className="flex justify-center mt-4">
-              <img
-                src={preview}
-                alt="Game Preview"
-                className="rounded-lg border border-gray-700 w-48 h-48 object-cover shadow-md"
-              />
-            </div>
-          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="w-full text-gray-300"
+            onChange={(e) => setImage(e.target.files[0])}
+          />
 
-          {/* Error */}
-          {error && (
-            <p className="text-red-400 text-sm font-medium whitespace-pre-line text-center">
-              {error}
-            </p>
-          )}
-
-          {/* Submit */}
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 transition-all duration-200 text-white py-2.5 rounded-lg font-semibold tracking-wide"
+            className="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded font-semibold"
           >
-            {isLoading ? "Saving..." : "Save Changes"}
+            {isLoading ? <SmallSpinner /> : "Save Changes"}
           </button>
-
-          {isLoading && (
-            <div className="flex justify-center mt-4">
-              <SmallSpinner />
-            </div>
-          )}
         </form>
       </div>
     </div>

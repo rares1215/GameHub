@@ -2,6 +2,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.cache import cache
 from .models import Game, Favorite
+import os
 
 
 @receiver([post_save, post_delete], sender=Game)
@@ -20,3 +21,14 @@ def invalidate_favorite_cache(sender, instance, **kwargs):
     """
     cache.delete("cached_game_ids")
     print("Favorite changed, game cache cleared.")
+
+@receiver(post_delete, sender=Game)
+def delete_game_image(sender, instance, **kwargs):
+    """
+    Delete image file from storage when a Game is deleted.
+    """
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+            print(f"🗑️ Deleted image file: {instance.image.path}")
+
