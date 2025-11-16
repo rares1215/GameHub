@@ -19,7 +19,7 @@ export const SingleGame = () => {
   useEffect(() => {
     getGame();
 
-    // Decode JWT pentru a afla utilizatorul curent
+    // Decoded token to find out the current user
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       const decoded = jwtDecode(token);
@@ -50,14 +50,14 @@ export const SingleGame = () => {
   const previewReview = game.reviews?.[0];
   const hasReviewed = game.reviews?.some((rev) => rev.user === currentUser);
 
-  // Funcție care reîncarcă jocul (după adăugare / edit / ștergere review)
+  // Reload the page after adding or deleting a review
   const handleAddReview = async () => {
     await getGame();
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-purple-950 text-white">
-        {/* ======== HERO IMAGE ======== */}
+        {/*HERO IMAGE*/}
         <div className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden bg-black">
           <img
             src={
@@ -73,13 +73,13 @@ export const SingleGame = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
         </div>
 
-      {/* ======== DESCRIPTION ======== */}
+      {/*DESCRIPTION*/}
       <div className="max-w-5xl mx-auto px-6 py-10">
         <p className="text-gray-300 leading-relaxed text-lg border-l-4 border-purple-500 pl-5 mb-10">
           {game.description}
         </p>
 
-        {/* ======== GAME DETAILS ======== */}
+        {/*GAME DETAILS*/}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl shadow-2xl p-8 backdrop-blur-md">
           <h2 className="text-2xl font-bold text-purple-400 mb-6 tracking-wide">
             Game Details
@@ -132,7 +132,7 @@ export const SingleGame = () => {
           </div>
         </div>
 
-        {/* ======== REVIEWS ======== */}
+        {/*REVIEWS*/}
         <div className="mt-14">
           <h3 className="text-2xl font-bold text-purple-300 mb-6 flex items-center gap-2">
             <Gamepad2 size={22} /> Reviews
@@ -171,7 +171,7 @@ export const SingleGame = () => {
             </div>
           )}
 
-          {/* ======== ADD REVIEW ======== */}
+          {/*ADD REVIEW*/}
           <div className="mt-16 border-t border-gray-800 pt-10">
             {!hasReviewed ? (
               <AddReview gameId={game.id} onReviewAdded={handleAddReview} />

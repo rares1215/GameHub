@@ -5,30 +5,27 @@ from .models import Game, Favorite
 import os
 
 
+# Invalidate cached game list when a game is added/updated/deleted
 @receiver([post_save, post_delete], sender=Game)
 def invalidate_game_cache(sender, instance, **kwargs):
-    """
-    Golește cache-ul cu ID-urile jocurilor când adaugi / ștergi un joc.
-    """
-    cache.delete("cached_game_ids")
-    print("Game cache cleared, Game updated or deleted.")
+    cache.delete_pattern("games_list*")
+    print("🟣 Game list cache cleared due to Game change.")
 
 
+# Invalidate cache when a Favorite is added or removed
 @receiver([post_save, post_delete], sender=Favorite)
 def invalidate_favorite_cache(sender, instance, **kwargs):
-    """
-    Golește cache-ul când userul adaugă sau scoate un joc de la favorite.
-    """
-    cache.delete("cached_game_ids")
-    print("Favorite changed, game cache cleared.")
+    cache.delete_pattern("games_list*")   # because is_favorite changes
+    print("💛 Favorite updated → game list cache cleared.")
 
+
+# When a game is deleted, delete its image
 @receiver(post_delete, sender=Game)
 def delete_game_image(sender, instance, **kwargs):
-    """
-    Delete image file from storage when a Game is deleted.
-    """
-    if instance.image:
-        if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
-            print(f"🗑️ Deleted image file: {instance.image.path}")
-
+    if instance.image and hasattr(instance.image, 'path'):
+        try:
+            if os.path.isfile(instance.image.path):
+                os.remove(instance.image.path)
+                print(f"🗑️ Deleted image file: {instance.image.path}")
+        except Exception as e:
+            print(f"⚠️ Could not delete image file: {e}")

@@ -16,7 +16,7 @@ export const GameCard = ({ game, onFavoriteChange }) => {
       const res = await api.post(`api/games/${game.id}/favorite/`);
       if (res.status === 200) {
         setIsFavorite(!isFavorite);
-        onFavoriteChange?.(); // notifica parintele (Games/Favorites)
+        onFavoriteChange?.(); // Load the games again when we add to the favorites
       }
     } catch (err) {
       console.error("Error toggling favorite:", err);
@@ -50,7 +50,7 @@ export const GameCard = ({ game, onFavoriteChange }) => {
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-all duration-300 group-hover:from-black/60"></div>
 
-        {/* ⭐ Favorite button */}
+        {/*Favorite button */}
         <button
           onClick={handleToggleFavorite}
           disabled={isLoading}

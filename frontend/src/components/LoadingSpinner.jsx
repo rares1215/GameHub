@@ -15,10 +15,7 @@ export const LoadingSpinner = () => {
 export const SmallSpinner = () => {
   return (
     <div className="relative flex items-center justify-center mt-10">
-      {/* Halo pulsant */}
       <div className="absolute w-8 h-8 bg-purple-500/30 rounded-full blur-lg animate-pulse"></div>
-
-      {/* Spinner principal */}
       <div className="w-6 h-6 border-3 border-t-transparent border-purple-400 rounded-full animate-spin"></div>
     </div>
   );

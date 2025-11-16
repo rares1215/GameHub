@@ -50,31 +50,18 @@ class GameViewSet(viewsets.ModelViewSet):
     ordering = ['-release_date']
 
     def get_queryset(self):
-        """
-        Cacheăm Doar ID-urile jocurilor.
-        Apoi reconstruim queryset-ul real pentru Django Filters.
-        """
-        cached_ids = cache.get("cached_game_ids")
-
-        if cached_ids is None:
-            print("⚙️ Caching game IDs in Redis...")
-            cached_ids = list(
-                Game.objects.annotate(
-                    avg_rating=Avg("reviews__rating"),
-                    all_ratings=Count("reviews")
-                ).values_list("id", flat=True)
-            )
-            cache.set("cached_game_ids", cached_ids, 60 * 15)  # 15 minute
-
-        # reconstruim queryset-ul real din IDs
         return (
-            Game.objects.filter(id__in=cached_ids)
-            .prefetch_related("reviews")
+            Game.objects.prefetch_related('reviews')
             .annotate(
                 avg_rating=Avg("reviews__rating"),
                 all_ratings=Count("reviews")
             )
         )
+
+    @method_decorator(vary_on_headers("Authorization"))
+    @method_decorator(cache_page(60 * 15, key_prefix='games_list'))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -92,7 +79,7 @@ class GameViewSet(viewsets.ModelViewSet):
             )
             context["favorite_ids"] = favorite_ids
         return context
-    
+
 
 ########################### Review Views ######################
 

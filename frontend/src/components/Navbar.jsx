@@ -75,7 +75,7 @@ export const Navbar = () => {
 
   return (
     <>
-      {/* Sidebar (desktop) */}
+      {/* Sidebar Large Screens */}
       <div className="hidden md:flex fixed left-0 top-0 h-screen w-60 bg-gradient-to-b from-black via-gray-900 to-purple-900 border-r border-gray-800 shadow-lg flex-col justify-between py-8 px-4 z-40">
         {/* Logo */}
         <div className="flex items-center justify-center mb-10">

@@ -12,7 +12,7 @@ export const AdminGame = ({ game }) => {
     try {
       await api.delete(`api/games/${game.id}/`);
       alert("Game deleted successfully!");
-      window.location.reload(); // simplu momentan
+      window.location.reload();
     } catch (err) {
       console.error("Error deleting game:", err);
     } finally {
