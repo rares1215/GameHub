@@ -89,7 +89,6 @@ class GameSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("The release date can't be in the future!")
         return value
 
-    # Calculăm dinamic is_favorite, dar folosind contextul optimizat
     def get_is_favorite(self, obj):
         favorite_ids = self.context.get("favorite_ids", set())
         return obj.id in favorite_ids
